@@ -3,10 +3,10 @@
 
 void killSwitchCallback(const std_msgs::Bool::ConstPtr& kill_switch_bool)
 {
-  // ROS_INFO("I heard: [%s]", msg->data.c_str());
-  ROS_INFO("Caught killswitch");
-  if (!kill_switch_bool[0]) {
-    ROS_INFO("falsy");
+  if (!kill_switch_bool->data) {
+    ROS_INFO("Caught killswitch");
+    // TODO When a message is received, the value of the GPIO pin with id killswitch_pin must be set to the value contained 
+    //      in killswitch_pin_default if the value of the message is false.
   }
 }
 
