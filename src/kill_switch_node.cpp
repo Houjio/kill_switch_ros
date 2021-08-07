@@ -1,13 +1,43 @@
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #include "ros/ros.h"
-#include "std_msgs/Bool.h" 
+#include "std_msgs/Bool.h"
+
+using namespace std;
 
 void killSwitchCallback(const std_msgs::Bool::ConstPtr& kill_switch_bool)
 {
-  if (!kill_switch_bool->data) {
-    ROS_INFO("Caught killswitch");
-    // TODO When a message is received, the value of the GPIO pin with id killswitch_pin must be set to the value contained 
-    //      in killswitch_pin_default if the value of the message is false.
+  bool killswitch_pin_default_value;
+  int killswitch_pin;
+
+  ros::param::get("/killswitch_pin_default_value", killswitch_pin_default_value);
+  ros::param::get("/killswitch_pin", killswitch_pin);
+  
+  std::stringstream dirss;
+  dirss << "/sys/class/gpio" << killswitch_pin << "/value";
+  std::string dir = dirss.str();
+
+  ofstream file ( dir );
+
+  if (kill_switch_bool->data) {
+    ROS_INFO("Caught killswitch true");
+    if (killswitch_pin_default_value) {
+      file<<"1";
+    } else {
+      file<<"0";
+    }
+  } else {
+    ROS_INFO("Caught killswitch false");
+    if (killswitch_pin_default_value) {
+      file<<"0";
+    } else {
+      file<<"1";
+    }
   }
+
+  file.close();
 }
 
 int main(int argc, char **argv)
